@@ -17,24 +17,41 @@ class enter(threading.Thread):
         self.usr=name
 
     def run(self):
+        chmd=False
         while True:
             say=input(">>>")
-            sendfile=re.match("sendfile (.+) (.+)",say)
-            if sendfile:
-                filename=sendfile.group(2)
-                if os.path.exists(filename):
-                    sock.sendall(say.encode('ascii'))
-                else:
-                    print("The file non exists")
+            if say=="leave":
+                chmd=False
+                print("leave chat")
+                continue
             else:
-                if(say=="n" or say=="N" or say=="y" or say=="Y"):
-                    sock.sendall(b'  ')
-                if(say=="logout" or say=="friendls"):
-                    say+="  "
-                sock.sendall(say.encode('ascii'))
-                if(say=="logout"):
-                    sock.close()
-                    break
+                chatmd=re.match("chat (.+)",say)
+                if chatmd:
+                    tar=chatmd.group(1)
+                    chmd=True    
+                    continue
+
+            if chmd:
+                opt="send "+tar+" "+say
+                sock.sendall(opt.encode('ascii'))
+            else: 
+                #Nomal output
+                sendfile=re.match("sendfile (.+) (.+)",say)
+                if sendfile:
+                    filename=sendfile.group(2)
+                    if os.path.exists(filename):
+                        sock.sendall(say.encode('ascii'))
+                    else:
+                        print("The file non exists")
+                else:
+                    if(say=="n" or say=="N" or say=="y" or say=="Y"):
+                        sock.sendall(b'  ')
+                    if(say=="logout" or say=="friendls"):
+                        say+="  "
+                    sock.sendall(say.encode('ascii'))
+                    if(say=="logout"):
+                        sock.close()
+                        break
                  
 
 class listen(threading.Thread):

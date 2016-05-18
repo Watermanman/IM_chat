@@ -132,7 +132,7 @@ class Newline(threading.Thread):
                     else:
                         self.sock.sendall(b'Non exist Member')
             else:
-                print(str(self.ident)+"nonexsit cmd")
+                print("nonexsit cmd")
 
 if __name__ =="__main__":
     server()
