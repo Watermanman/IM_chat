@@ -2,6 +2,8 @@
 
 import socket,threading,time
 import getpass
+import os
+import re
 
 def chklog():
     user=input("Username: ")
@@ -17,13 +19,22 @@ class enter(threading.Thread):
     def run(self):
         while True:
             say=input(">>>")
-            #print(self.usr+":"+say)
-            # sdMsg="{} {}".format(self.usr,say)
-            if(say=="logout" or say=="friendls"):
-                say+="  "
-            sock.sendall(say.encode('ascii'))
-            if(say=="logout"):
-                sock.close()
+            sendfile=re.match("sendfile (.+) (.+)",say)
+            if sendfile:
+                filename=sendfile.group(2)
+                if os.path.exists(filename):
+                    sock.sendall(say.encode('ascii'))
+                else:
+                    print("The file non exists")
+            else:
+                if(say=="n" or say=="N" or say=="y" or say=="Y"):
+                    sock.sendall(b'  ')
+                if(say=="logout" or say=="friendls"):
+                    say+="  "
+                sock.sendall(say.encode('ascii'))
+                if(say=="logout"):
+                    sock.close()
+                    break
                  
 
 class listen(threading.Thread):
@@ -33,18 +44,12 @@ class listen(threading.Thread):
     def run(self):
         while True:
             getMsg=sock.recv(1024)
-        #getMsg="lister:hello~"
             if (getMsg):
                 print("\n"+getMsg.decode('ascii'))
-                # usr=getMsg[0:getMsg.index(":")]
-                # content=getMsg[getMsg.index(":")+1:]
-                # print("\n"+usr+":"+content)
 
 
 
 if __name__ == "__main__":
-    # sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    # sock.connect(('127.0.0.1',2289))
     login=True
     while login:
         sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
